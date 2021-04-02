@@ -9,7 +9,8 @@ my_budget = FastAPI()
 
 origins = [
     "http://localhost.tiangolo.com", "https://localhost.tiangolo.com",
-    "http://localhost", "http://localhost:8080", "postgres://postgres:1317@localhost:5432/CARLOS"
+    "http://localhost", "http://https://https://mybudgetvue.herokuapp.com/", 
+    "postgres://postgres:1317@localhost:5432/CARLOS",
 ]
 
 my_budget.add_middleware(
