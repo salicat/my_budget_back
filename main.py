@@ -8,8 +8,11 @@ from routers.goal_router import router as router_goals
 my_budget = FastAPI()
 
 origins = [
-    "http://localhost.tiangolo.com", "https://localhost.tiangolo.com",
-    "http://localhost:8080", "http://localhost:8000", "postgres://postgres:1317@localhost:5432/CARLOS"
+    "http://localhost.tiangolo.com", 
+    "https://localhost.tiangolo.com",
+    "http://localhost:8080", 
+    "http://localhost:8000", 
+    "https://mybudgetvue.herokuapp.com/"
 ]
 
 my_budget.add_middleware(
