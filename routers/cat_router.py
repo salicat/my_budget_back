@@ -1,9 +1,12 @@
+from datetime import date, datetime
+from dateutil.relativedelta import *
 from typing import List
 from fastapi import Depends, APIRouter, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.elements import Null
-from sqlalchemy.sql.expression import true
+from sqlalchemy.sql.expression import null, true
 from starlette import responses
+from starlette.routing import Router
 from db.db_connection import get_db
 from db.users_db import UserInDB
 from db.regs_db import RegsInDb
@@ -26,32 +29,38 @@ async def create_cat(cat_in: CatIn, db: Session = Depends(get_db)):
         user_cats.append(cat_in.category)
         if cat_in.type == "liabilities":
             user_in_db.liabilities = user_in_db.liabilities + cat_in.value
-            cat_in.budget = 0
             new_cat = CatsInDb(**cat_in.dict())
             db.add(new_cat)
             db.commit()
             db.flush(new_cat)
         if cat_in.type == "passives":            
             user_in_db.passives = user_in_db.passives + cat_in.value
-            cat_in.budget = 0
             new_cat = CatsInDb(**cat_in.dict())
             db.add(new_cat)
             db.commit()
             db.flush(new_cat)
         if cat_in.type == "incomes":
-            cat_in.value = 0
             new_cat = CatsInDb(**cat_in.dict())
             db.add(new_cat)
             db.commit()
             db.flush(new_cat)
         if cat_in.type == "expenses":
-            cat_in.value = 0
             new_cat = CatsInDb(**cat_in.dict())
             db.add(new_cat)
             db.commit()
             db.flush(new_cat)
     return { "message" : cat_in.category + " creada con exito"}
-    
+        
+@router.get("/user/cats_expires/{username}")
+async def report_cats(username:str, db: Session = Depends(get_db)):
+    all_cats = db.query(CatsInDb).all()
+    expenses = []
+    for cat in all_cats:
+        if cat.username == username:
+            if cat.type == "expenses":
+                expenses.append([cat.category, cat.value]) 
+    return expenses
+
 @router.get("/user/cats/{username}")
 async def get_cats(username : str, db: Session = Depends(get_db)):
     all_cats = db.query(CatsInDb).all()
@@ -61,6 +70,16 @@ async def get_cats(username : str, db: Session = Depends(get_db)):
         "liabilities" : [],
         "passives" : []
     }
+    
+    today = datetime.date(datetime.today())
+    
+    
+    def expire (x):
+        if x <= today :
+            x = x + relativedelta(months =+1)
+            return x  
+        if x > today:
+            return x
     for cat in all_cats:
         if cat.username == username:
             if cat.type == "incomes":
@@ -68,13 +87,15 @@ async def get_cats(username : str, db: Session = Depends(get_db)):
                                             "budget" : cat.budget})
             if cat.type == "expenses":
                 user_cats["expenses"].append({"category":cat.category,
-                                            "budget" : cat.budget})
+                                            "recurrency" : cat.recurrency,
+                                            "budget" : cat.budget,
+                                            "day" : expire(cat.day)})
             if cat.type == "liabilities":
                 user_cats["liabilities"].append({"category":cat.category,
-                                            "value" : cat.value})
+                                                "value" : cat.value})
             if cat.type == "passives":
                 user_cats["passives"].append({"category":cat.category,
-                                            "value" : cat.value})
+                                            "value": cat.value})
     return user_cats
  
 @router.delete("/user/delete/category/")
@@ -100,12 +121,10 @@ async def delete_cat(cat_del: CatDel, db: Session = Depends(get_db)):
                 db.commit()
                 db.flush(cat)
                 if cat_del.type == "incomes":
-                    user_in_db.incomes = user_in_db.incomes - cat.value
                     db.commit()
                     db.refresh(user_in_db)
                     return {"message" : "Se eliminaron " +  " " + str(regs_deleted) + " registro del usuario " + cat_del.username}              
                 if cat_del.type == "expenses":        
-                    user_in_db.expenses = user_in_db.expenses - cat_value         
                     db.commit()
                     db.refresh(user_in_db)
                     return {"message" : "Se eliminaron " +  " " + str(regs_deleted) + " registro del usuario " + cat_del.username}

@@ -1,11 +1,14 @@
 from pydantic import BaseModel
+from datetime import date
 
 class CatIn(BaseModel):
     category    : str
     type        : str
     username    : str
-    value       : int
-    budget      : int    
+    budget      : int
+    value       : int    
+    recurrency  : bool
+    day         : date
 
 class CatDel(BaseModel):
     category    : str

@@ -24,8 +24,6 @@ async def create_user(user_in: UserIn, db: Session = Depends(get_db)):
     print(user_in_db)
     if user_in_db == None:
         new_user = UserInDB(**user_in.dict(),
-                            incomes     = 0,
-                            expenses    = 0,
                             liabilities = 0,
                             passives    = 0,
                             )
@@ -43,8 +41,6 @@ async def get_balance(username: str, db: Session = Depends(get_db)):
     if user_in_db == None:
         raise HTTPException(status_code=404, detail="El usuario no existe")
         
-    return {"incomes" : user_in_db.incomes,
-            "expenses" :  user_in_db.expenses,
-            "liabilities" : user_in_db.liabilities,
+    return {"liabilities" : user_in_db.liabilities,
             "passives" : user_in_db.passives,
             }

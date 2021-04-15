@@ -10,9 +10,8 @@ class RegIn(BaseModel):
 
 class RegConsult(BaseModel):
     username: str
-    type: str
-    category :str    
-
+    month: int
+    
 class RegDel(BaseModel):
     id : list
     username : str

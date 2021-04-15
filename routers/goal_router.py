@@ -1,6 +1,4 @@
 from datetime import date, datetime
-from re import S
-from typing import List
 from fastapi import Depends, APIRouter, HTTPException
 from pydantic.networks import HttpUrl
 from sqlalchemy.orm import Session
@@ -56,14 +54,13 @@ async def goal_update(goal_up : GoalUp, db : Session = Depends(get_db)):
     remain_val = (goals_in_db.final_value - goals_in_db.current_val)/(goals_in_db.final_value)*100  
     return {"message": "Aun te queda " + str(remain_val) + "%"}
 
-
 @router.get ("/user/goals/track/{username}")
 async def goals_track(username : str, db : Session = Depends(get_db)):
     all_goals = db.query(GoalsInDb).all()
     user_goals = []
     for goal in all_goals:
         if username == goal.username:
-            today = datetime.today()
+            today = datetime.date(datetime.today())
             delta = goal.final_date - today
             user_goals.append({"nombre"         : goal.name,
                                 "porc"          : round((goal.current_val / goal.final_value) * 100),

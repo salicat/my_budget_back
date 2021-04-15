@@ -9,8 +9,8 @@ my_budget = FastAPI()
 
 origins = [
     "http://localhost.tiangolo.com", "https://localhost.tiangolo.com",
-    "http://localhost", "http://https://https://mybudgetvue.herokuapp.com/" 
-    ]
+    "http://localhost:8080", "http://localhost:8000", "postgres://postgres:1317@localhost:5432/CARLOS"
+]
 
 my_budget.add_middleware(
     CORSMiddleware, allow_origins=origins,

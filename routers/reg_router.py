@@ -1,3 +1,4 @@
+from datetime import date, datetime
 from typing import List
 from fastapi import Depends, APIRouter, HTTPException
 from sqlalchemy.orm import Session
@@ -24,14 +25,12 @@ async def make_register(reg_in: RegIn, db: Session = Depends(get_db)):
     if reg_in.category not in user_cats:
         raise HTTPException(status_code=403, detail="no tienes una categoria " + reg_in.category)
     if reg_in.type == "incomes":
-        user_in_db.incomes = user_in_db.incomes + reg_in.value
         cat_in_db.value = cat_in_db.value + reg_in.value 
         new_reg_in = RegsInDb(**reg_in.dict())
         db.add(new_reg_in)
         db.commit()
         db.refresh(new_reg_in)
     if reg_in.type == "expenses":
-        user_in_db.expenses = user_in_db.expenses + reg_in.value
         cat_in_db.value = cat_in_db.value + reg_in.value 
         new_reg_in = RegsInDb(**reg_in.dict())
         db.add(new_reg_in)
@@ -62,8 +61,17 @@ async def get_records(username:str, db: Session = Depends(get_db)):
     user_regs = []
     for reg in regs:
         if reg.username == username:
-            user_regs.append(reg)
-    
+            user_regs.append(reg)                
+    return user_regs
+
+@router.post("/user/month_regs")
+async def get_rec_date(reg_consult :RegConsult, db: Session = Depends(get_db)):
+    regs = db.query(RegsInDb).all()
+    user_regs = []
+    for reg in regs:
+        if reg.username == reg_consult.username:
+            if reg.date.month == reg_consult.month:
+                user_regs.append(reg)                
     return user_regs
 
 @router.delete("/user/records/delete/")

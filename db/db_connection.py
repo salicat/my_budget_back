@@ -18,5 +18,3 @@ def get_db():
 
 Base = declarative_base()
 Base.metadata.schema = "my_budget_db"
-
-

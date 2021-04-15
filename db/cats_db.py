@@ -1,5 +1,7 @@
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy import Integer, String
+from sqlalchemy.sql.sqltypes import Boolean
+from sqlalchemy import Date
 from db.db_connection import Base, engine
 
 class CatsInDb(Base):
@@ -7,7 +9,9 @@ class CatsInDb(Base):
     category    = Column(String, primary_key=True)
     type        = Column(String)
     username    = Column(String, ForeignKey("users.username"))
-    value       = Column(Integer)
     budget      = Column(Integer)
+    value       = Column(Integer)
+    recurrency  = Column(Boolean)
+    day         = Column(Date, nullable=True )
     
 Base.metadata.create_all(bind=engine)
