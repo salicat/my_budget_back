@@ -1,1 +1,1 @@
-web: uvicorn main:my_budget --host=0.0.0.0 --port=${PORT:-5000}
+worker: uvicorn main:my_budget --host=0.0.0.0 --port=${PORT:-5000}
