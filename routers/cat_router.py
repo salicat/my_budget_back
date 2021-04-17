@@ -1,5 +1,4 @@
 from datetime import date, datetime
-from dateutil.relativedelta import *
 from typing import List
 from fastapi import Depends, APIRouter, HTTPException
 from sqlalchemy.orm import Session
