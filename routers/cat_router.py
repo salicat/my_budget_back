@@ -70,15 +70,14 @@ async def get_cats(username : str, db: Session = Depends(get_db)):
         "passives" : []
     }
     
-    today = datetime.date(datetime.today())
-    
-    
-    def expire (x):
-        if x <= today :
-            x = x + relativedelta(months =+1)
-            return x  
-        if x > today:
-            return x
+    #today = datetime.date(datetime.today())     
+    #def expire (x):
+    #    if x <= today :
+    #        x = x + relativedelta(months =+1)
+    #        return x  
+    #    if x > today:
+    #        return x
+
     for cat in all_cats:
         if cat.username == username:
             if cat.type == "incomes":
@@ -88,7 +87,7 @@ async def get_cats(username : str, db: Session = Depends(get_db)):
                 user_cats["expenses"].append({"category":cat.category,
                                             "recurrency" : cat.recurrency,
                                             "budget" : cat.budget,
-                                            "day" : expire(cat.day)})
+                                            "day" : cat.day})
             if cat.type == "liabilities":
                 user_cats["liabilities"].append({"category":cat.category,
                                                 "value" : cat.value})
