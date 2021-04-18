@@ -12,7 +12,7 @@ origins = [
     "https://localhost.tiangolo.com",
     "http://localhost:8080", 
     "http://localhost:8000", 
-    "https://mybudgetvue.herokuapp.com/"
+    "https://mybudgetvue.herokuapp.com"
 ]
 
 my_budget.add_middleware(
