@@ -2,6 +2,7 @@ from datetime import date, datetime
 from typing import List
 from fastapi import Depends, APIRouter, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy.sql.expression import null
 from sqlalchemy.sql.functions import user
 from db.db_connection import get_db
 from db.users_db import UserInDB
@@ -64,15 +65,28 @@ async def get_records(username:str, db: Session = Depends(get_db)):
             user_regs.append(reg)                
     return user_regs
 
-@router.post("/user/month_regs")
-async def get_rec_date(reg_consult :RegConsult, db: Session = Depends(get_db)):
-    regs = db.query(RegsInDb).all()
-    user_regs = []
+@router.get("/user/month_regs/")
+async def rec_date(reg_consult : RegConsult, db: Session = Depends(get_db)):
+    regs = db.query(RegsInDb).all()    
+    user_cats = []
+    cats = db.query(CatsInDb).all()    
+
+    for cat in cats:
+        if reg_consult.username == cat.username:                        
+            if cat.type == "expenses":                                
+                user_cats.append({cat.category:{"budget" : cat.budget,
+                                                "value"  : 0
+                                                }})
+
     for reg in regs:
-        if reg.username == reg_consult.username:
-            if reg.date.month == reg_consult.month:
-                user_regs.append(reg)                
-    return user_regs
+        if reg.date.month == reg_consult.month:
+            for cat in user_cats:
+                if reg.category in cat.keys():       
+                    cat[reg.category]["value"] = cat[reg.category]["value"] + reg.value                                                 
+    
+    return user_cats
+
+
 
 @router.delete("/user/records/delete/")
 async def del_record(reg_del:RegDel, db: Session = Depends(get_db)):
@@ -89,14 +103,6 @@ async def del_record(reg_del:RegDel, db: Session = Depends(get_db)):
                 db.flush(reg)
       
     for i in user_regs:
-        if i.type == "incomes":
-            user_in_db.incomes = user_in_db.incomes - i.value
-            db.commit()
-            db.refresh(user_in_db)
-        if i.type == "expenses":
-            user_in_db.expenses = user_in_db.expenses - i.value
-            db.commit()
-            db.refresh(user_in_db)
         if i.type == "liabilities":
             user_in_db.liabilities = user_in_db.liabilities - i.value
             db.commit()

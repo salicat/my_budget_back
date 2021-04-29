@@ -50,15 +50,6 @@ async def create_cat(cat_in: CatIn, db: Session = Depends(get_db)):
             db.flush(new_cat)
     return { "message" : cat_in.category + " creada con exito"}
         
-@router.get("/user/cats_expires/{username}")
-async def report_cats(username:str, db: Session = Depends(get_db)):
-    all_cats = db.query(CatsInDb).all()
-    expenses = []
-    for cat in all_cats:
-        if cat.username == username:
-            if cat.type == "expenses":
-                expenses.append([cat.category, cat.value]) 
-    return expenses
 
 @router.get("/user/cats/{username}")
 async def get_cats(username : str, db: Session = Depends(get_db)):
