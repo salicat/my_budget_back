@@ -65,24 +65,27 @@ async def get_records(username:str, db: Session = Depends(get_db)):
             user_regs.append(reg)                
     return user_regs
 
-@router.get("/user/month_regs/")
-async def rec_date(reg_consult : RegConsult, db: Session = Depends(get_db)):
+@router.get("/user/month_regs/{username}/{month}")
+async def rec_date(username: str, month :int, db: Session = Depends(get_db)):
     regs = db.query(RegsInDb).all()    
     user_cats = []
     cats = db.query(CatsInDb).all()    
 
     for cat in cats:
-        if reg_consult.username == cat.username:                        
-            if cat.type == "expenses":                                
-                user_cats.append({cat.category:{"budget" : cat.budget,
-                                                "value"  : 0
-                                                }})
+        if username == cat.username:                        
+            if cat.type == "expenses":
+                if cat.recurrency == True:
+                    user_cats.append({  "category"  : cat.category, 
+                                        "budget"    : cat.budget,
+                                        "value"     : 0,
+                                        "expires"   : cat.day
+                                                    })
 
     for reg in regs:
-        if reg.date.month == reg_consult.month:
+        if reg.date.month == month:
             for cat in user_cats:
-                if reg.category in cat.keys():       
-                    cat[reg.category]["value"] = cat[reg.category]["value"] + reg.value                                                 
+                if reg.category in cat["category"]:       
+                    cat["value"] = cat["value"] + reg.value                                                 
     
     return user_cats
 

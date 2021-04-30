@@ -59,34 +59,50 @@ async def get_cats(username : str, db: Session = Depends(get_db)):
         "expenses" : [],
         "liabilities" : [],
         "passives" : []
-    }
-    
-    #today = datetime.date(datetime.today())     
-    #def expire (x):
-    #    if x <= today :
-    #        x = x + relativedelta(months =+1)
-    #        return x  
-    #    if x > today:
-    #        return x
-
+    }  
+ 
     for cat in all_cats:
         if cat.username == username:
             if cat.type == "incomes":
-                user_cats["incomes"].append({"category":cat.category,
-                                            "budget" : cat.budget})
+                user_cats["incomes"].append({   "category"  :cat.category,
+                                                "budget"    : cat.budget})
             if cat.type == "expenses":
-                user_cats["expenses"].append({"category":cat.category,
-                                            "recurrency" : cat.recurrency,
-                                            "budget" : cat.budget,
-                                            "day" : cat.day})
+                user_cats["expenses"].append({  "category"      :cat.category,
+                                                "recurrency"    : cat.recurrency,
+                                                "budget"        : cat.budget,
+                                                "day"           : cat.day})
             if cat.type == "liabilities":
-                user_cats["liabilities"].append({"category":cat.category,
-                                                "value" : cat.value})
+                user_cats["liabilities"].append({   "category"  :cat.category,
+                                                    "value"     : cat.value})
             if cat.type == "passives":
-                user_cats["passives"].append({"category":cat.category,
-                                            "value": cat.value})
+                user_cats["passives"].append({      "category"  :cat.category,
+                                                    "value"     : cat.value})
     return user_cats
- 
+
+@router.get("/user/cats/{username}/{month}")
+async def expire_cats(username: str, month: int, db:Session = Depends(get_db)):
+    regs = db.query(RegsInDb).all()    
+    user_cats = []
+    cats = db.query(CatsInDb).all()    
+            
+    for cat in cats:
+        if username == cat.username:                        
+            if cat.type == "expenses":
+                user_cats.append({  "name"      : cat.category,
+                                    "budget"    : cat.budget,
+                                    "value"     : 0
+                                    })
+
+    for reg in regs:
+        if reg.date.month == month:
+            for cat in user_cats:
+                if reg.category == cat["name"]:
+                    cat["value"] = cat["value"] + reg.value    
+    
+    return user_cats
+    
+
+
 @router.delete("/user/delete/category/")
 async def delete_cat(cat_del: CatDel, db: Session = Depends(get_db)):
     user_cats = db.query(CatsInDb).get(cat_del.category)
