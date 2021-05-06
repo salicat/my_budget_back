@@ -65,6 +65,16 @@ async def get_records(username:str, db: Session = Depends(get_db)):
             user_regs.append(reg)                
     return user_regs
 
+@router.get("/user/month_records/{username}/{month}")
+async def month_records(username: str, month:int, db:Session = Depends(get_db)):
+    regs = db.query(RegsInDb).all()
+    user_regs = []
+    for reg in regs:
+        if reg.username == username:
+            if reg.date.month == month:
+                user_regs.append(reg)         
+    return  user_regs
+
 @router.get("/user/month_regs/{username}/{month}")
 async def rec_date(username: str, month :int, db: Session = Depends(get_db)):
     regs = db.query(RegsInDb).all()    
