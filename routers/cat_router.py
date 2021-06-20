@@ -107,44 +107,12 @@ async def expire_cats(username: str, month: int, db:Session = Depends(get_db)):
 async def delete_cat(cat_del: CatDel, db: Session = Depends(get_db)):
     user_cats = db.query(CatsInDb).get(cat_del.category)
     all_cats = db.query(CatsInDb).all()
-    user_in_db = db.query(UserInDB).get(cat_del.username)
-    regs_in_db = db.query(RegsInDb).all()
-    cat_value = user_cats.value    
-    regs_deleted = 0
-
-    for reg in regs_in_db:
-        if reg.category == cat_del.category:
-            regs_deleted += 1
-            db.delete(reg)
-            db.commit()
-            db.flush(reg)
-
+        
     for cat in all_cats:
         if cat_del.username == cat.username:
             if cat.category == cat_del.category:
                 db.delete(cat)
                 db.commit()
                 db.flush(cat)
-                if cat_del.type == "incomes":
-                    db.commit()
-                    db.refresh(user_in_db)
-                    return {"message" : "Se eliminaron " +  " " + str(regs_deleted) + " registro del usuario " + cat_del.username}              
-                if cat_del.type == "expenses":        
-                    db.commit()
-                    db.refresh(user_in_db)
-                    return {"message" : "Se eliminaron " +  " " + str(regs_deleted) + " registro del usuario " + cat_del.username}
-                if cat_del.type == "liabilities":
-                    user_in_db.liabilities = user_in_db.liabilities - cat_value
-                    db.commit()
-                    db.refresh(user_in_db)
-                    return {"message" : "Se eliminaron " +  " " + str(regs_deleted) + " registro del usuario " + cat_del.username}
-                if cat_del.type == "passives":
-                    user_in_db.passives = user_in_db.passives - cat_value           
-                    db.commit()
-                    db.refresh(user_in_db)
-                    return {"message" : "Se eliminaron " +  " " + str(regs_deleted) + " regitro del usuario " + cat_del.username}
-                else:
-                    return {"Message" : "La cagates!!!"}   
-
-
+                
     
