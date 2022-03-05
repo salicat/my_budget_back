@@ -5,6 +5,7 @@ from routers.reg_router import router as router_transactions
 from routers.cat_router import router as router_categories
 from routers.goal_router import router as router_goals
 
+
 my_budget = FastAPI()
 
 origins = [

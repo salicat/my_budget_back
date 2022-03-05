@@ -11,6 +11,7 @@ class RegIn(BaseModel):
 class RegConsult(BaseModel):
     username: str
     month: int
+    year: int
 
 class RegMonth(BaseModel):
     category    : str
