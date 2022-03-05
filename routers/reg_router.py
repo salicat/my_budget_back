@@ -65,7 +65,7 @@ async def get_records(username:str, db: Session = Depends(get_db)):
             user_regs.append(reg)                
     return user_regs
 
-@router.get("/user/month_records/{username}//{year}/{month}")
+@router.get("/user/month_records/{username}/{year}/{month}")
 async def month_records(username: str, year:int, month:int, db:Session = Depends(get_db)):
     regs = db.query(RegsInDb).all()
     user_regs = []
