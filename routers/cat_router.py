@@ -100,9 +100,9 @@ async def expire_cats(username: str, year: int, month: int, db:Session = Depends
                     if reg.category == cat["name"]:
                         cat["value"] = cat["value"] + reg.value    
     
-    return user_cats
-    
+    per_value = sorted(user_cats, key= lambda x:x['value'], reverse=True)
 
+    return per_value
 
 @router.delete("/user/delete/category/")
 async def delete_cat(cat_del: CatDel, db: Session = Depends(get_db)):
