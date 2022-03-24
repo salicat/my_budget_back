@@ -77,7 +77,9 @@ async def get_cats(username : str, db: Session = Depends(get_db)):
             if cat.type == "passives":
                 user_cats["passives"].append({      "category"  :cat.category,
                                                     "value"     : cat.value})
-    return user_cats
+    per_name = sorted(user_cats, key= lambda x:x['category'], reverse=False)
+    
+    return per_name
 
 @router.get("/user/cats/{username}/{year}/{month}")
 async def expire_cats(username: str, year: int, month: int, db:Session = Depends(get_db)):
