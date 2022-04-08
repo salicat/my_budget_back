@@ -76,8 +76,8 @@ async def month_records(username: str, year:int, month:int, db:Session = Depends
                     user_regs.append(reg)         
     return  user_regs
 
-@router.get("/user/month_regs/{username}/{month}")
-async def rec_date(username: str, month :int, db: Session = Depends(get_db)):
+@router.get("/user/month_regs/{username}/{year}/{month}")
+async def rec_date(username: str, year: int, month :int, db: Session = Depends(get_db)):
     regs = db.query(RegsInDb).all()    
     user_cats = []
     cats = db.query(CatsInDb).all()    
@@ -94,10 +94,11 @@ async def rec_date(username: str, month :int, db: Session = Depends(get_db)):
 
     for reg in regs:
         if reg.date.month == month:
-            for cat in user_cats:
-                if reg.category in cat["category"]:       
-                    cat["value"] = cat["value"] + reg.value                                                 
-    
+            if reg.date.year == year:
+                for cat in user_cats:
+                    if reg.category in cat["category"]:       
+                        cat["value"] = cat["value"] + reg.value                                                 
+        
     return user_cats
 
 
