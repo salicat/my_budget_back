@@ -7,8 +7,7 @@ from db.db_connection import Base, engine
 
 class CatsInDb(Base):
     __tablename__= "categories"
-    id          = Column(Integer, primary_key=True)
-    category    = Column(String)
+    category    = Column(String, primary_key=True)
     type        = Column(String)
     username    = Column(String, ForeignKey("users.username"))
     budget      = Column(Integer)
