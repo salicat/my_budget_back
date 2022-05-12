@@ -12,6 +12,6 @@ class RegsInDb(Base):
     type        = Column(String)
     description = Column(String)
     category    = Column(String)
-    value       = Column(Floatnumber)
+    value       = Column(Integer)
 
 Base.metadata.create_all(bind=engine)
