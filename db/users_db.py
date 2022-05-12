@@ -6,8 +6,8 @@ class UserInDB(Base):
     __tablename__="users"
     username    = Column(String, primary_key=True, unique=True)
     password    = Column(String)
-    liabilities = Column(Floatnumber)
-    passives    = Column(Floatnumber)
+    liabilities = Column(Integer)
+    passives    = Column(Integer)
     
 
 Base.metadata.create_all(bind=engine)
