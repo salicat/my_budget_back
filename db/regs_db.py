@@ -1,3 +1,4 @@
+from tokenize import Floatnumber
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy import Integer, String, Date
 import datetime
@@ -11,6 +12,6 @@ class RegsInDb(Base):
     type        = Column(String)
     description = Column(String)
     category    = Column(String)
-    value       = Column(Integer)
+    value       = Column(Floatnumber)
 
 Base.metadata.create_all(bind=engine)
