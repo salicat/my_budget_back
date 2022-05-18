@@ -14,7 +14,7 @@ origins = [
     "http://localhost:8080", 
     "http://localhost:8000", 
     "https://mybudgetvue.herokuapp.com",
-    "https://6284cb9bfa1cbc6b83aab268--cosmic-sfogliatella-cf7c4c.netlify.app"
+    "https://6284ce8a8e5b226bcdd4a2c2--cosmic-sfogliatella-cf7c4c.netlify.app/"
 ]
 
 my_budget.add_middleware(
