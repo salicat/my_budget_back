@@ -13,9 +13,7 @@ origins = [
     "https://localhost.tiangolo.com",
     "http://localhost:8080", 
     "http://localhost:8000", 
-    "https://mybudgetvue.herokuapp.com",
-    "https://cosmic-sfogliatella-cf7c4c.netlify.app/",
-    "https://salicat.github.io/my_budget_vue/"
+    "https://mybudgetvue.herokuapp.com"
 ]
 
 my_budget.add_middleware(
