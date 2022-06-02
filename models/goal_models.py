@@ -4,13 +4,13 @@ from datetime import date
 class GoalIn (BaseModel):
     name        : str
     username    : str
-    final_value : float
+    final_value : int
     final_date  : date
 
 class GoalUp (BaseModel):
     name        : str
     username    : str
-    value       : float
+    value       : int
 
 class GoalDel (BaseModel):
     username    : str
@@ -18,8 +18,8 @@ class GoalDel (BaseModel):
 
 class GoalOut (BaseModel):
     name        : str
-    current_val : float
-    final_value : float
+    current_val : int
+    final_value : int
     final_date  : date
 
     class Config:
