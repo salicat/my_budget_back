@@ -18,4 +18,4 @@ def get_db():
         db.close()
 
 Base = declarative_base()
-Base.metadata.schema = "my_budget_db"
+Base.metadata.schema = "myBudgetDB"
