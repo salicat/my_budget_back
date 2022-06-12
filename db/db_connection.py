@@ -20,5 +20,5 @@ def get_db():
 Base = declarative_base()
 
 conn = engine.connect()
-if conn.dialect.has_schema(conn, schema_name):
+if conn.dialect.has_schema(conn, "myBudgetDB"):
     Base.metadata.schema = "myBudgetDB"
