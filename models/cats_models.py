@@ -5,8 +5,8 @@ class CatIn(BaseModel):
     category    : str
     type        : str
     username    : str
-    budget      : int
-    value       : int    
+    budget      : float
+    value       : float  
     recurrency  : bool
     day         : date
 
@@ -22,12 +22,12 @@ class CatTypes(BaseModel):
 class CatUpDate(BaseModel):
     category    : str
     username    : str
-    value       : int
+    value       : float
 
 class CatOut(BaseModel):
     category    : str
     type        : str
-    act_value   : int
+    act_value   : float
     
     class Config:
         orm_mode = True  

@@ -7,7 +7,7 @@ class RegIn(BaseModel):
     type        : str
     category    : str
     description : str
-    value       : int
+    value       : float
 
 class RegConsult(BaseModel):
     username    : str
@@ -16,8 +16,8 @@ class RegConsult(BaseModel):
 
 class RegMonth(BaseModel):
     category    : str
-    budget      : int
-    value       : int
+    budget      : float
+    value       : float
     
 class RegDel(BaseModel):
     id          : list
@@ -29,7 +29,7 @@ class RegOut(BaseModel):
     date        : date
     type        : str
     category    : str
-    value       : int
+    value       : float
 
     class Config:
         orm_mode = True  

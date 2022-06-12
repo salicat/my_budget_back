@@ -6,10 +6,10 @@ class UserIn(BaseModel):
 
 class UserOut(BaseModel):
     username    : str
-    incomes     : int
-    expenses    : int
-    liabilities : int
-    passives    : int
+    incomes     : float
+    expenses    : float
+    liabilities : float
+    passives    : float
     
     class Config:
         orm_mode = True  
