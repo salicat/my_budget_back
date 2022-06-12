@@ -6,9 +6,6 @@ from sqlalchemy.orm import sessionmaker
 DATABASE_URL = "postgresql://mvmltkesjxfeun:787a58ec4497befcfc2626b8dfd1032ead98b553032df74dc4780d736b33e9fb@ec2-52-72-99-110.compute-1.amazonaws.com:5432/d4d3chl5l23csp"
 engine = create_engine(DATABASE_URL)
 
-if not engine.dialect.has_schema(engine, schema_name):
-    engine.execute(sqlalchemy.schema.CreateSchema(schema_name))
-
 SessionLocal = sessionmaker(autocommit=False, 
                             autoflush=False, 
                             bind=engine)
@@ -21,4 +18,7 @@ def get_db():
         db.close()
 
 Base = declarative_base()
-Base.metadata.schema = "myBudgetDB"
+
+conn = engine.connect()
+if conn.dialect.has_schema(conn, schema_name):
+    Base.metadata.schema = "myBudgetDB"
