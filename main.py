@@ -18,10 +18,10 @@ origins = [
 
 my_budget.add_middleware(
     CORSMiddleware, 
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True, 
     allow_methods=["*"], 
-    allow_headers=[],
+    allow_headers=["*"],
 )
 
 my_budget.include_router(router_users)
