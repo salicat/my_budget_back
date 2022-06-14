@@ -16,7 +16,6 @@ router = APIRouter()
 @router.post("/user/register/")
 async def make_register(reg_in: RegIn, db: Session = Depends(get_db)):
     user_in_db = db.query(UserInDB).get(reg_in.username)
-    cat_in_db = db.query(CatsInDb).get(reg_in.category)
     all_cats = db.query(CatsInDb).all()
     user_cats = []       
     for cat in all_cats:        
@@ -25,27 +24,23 @@ async def make_register(reg_in: RegIn, db: Session = Depends(get_db)):
 
 
     if reg_in.type == "incomes":
-        cat_in_db.value = cat_in_db.value + reg_in.value 
         new_reg_in = RegsInDb(**reg_in.dict())
         db.add(new_reg_in)
         db.commit()
         db.refresh(new_reg_in)
     if reg_in.type == "expenses":
-        cat_in_db.value = cat_in_db.value + reg_in.value 
         new_reg_in = RegsInDb(**reg_in.dict())
         db.add(new_reg_in)
         db.commit()
         db.refresh(new_reg_in)
     if reg_in.type == "liabilities":        
         user_in_db.liabilities = user_in_db.liabilities + reg_in.value
-        cat_in_db.value = cat_in_db.value + reg_in.value 
         new_reg_in = RegsInDb(**reg_in.dict())
         db.add(new_reg_in)
         db.commit()
         db.refresh(new_reg_in)
     if reg_in.type == "passives":    
         user_in_db.passives = user_in_db.passives + reg_in.value
-        cat_in_db.value = cat_in_db.value + reg_in.value
         new_reg_in = RegsInDb(**reg_in.dict())
         db.add(new_reg_in)
         db.commit()
