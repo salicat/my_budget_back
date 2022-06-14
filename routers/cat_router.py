@@ -16,7 +16,7 @@ router = APIRouter()
  
 @router.post("/user/create/category/")
 async def create_cat(cat_in: CatIn, db: Session = Depends(get_db)):
-    all_cats = db.query(CatsInDb).all()
+    all_cats = db.query(CatsInDb).all() 
     user_in_db = db.query(UserInDB).get(cat_in.username)
     user_cats = []
     for cat in all_cats:
