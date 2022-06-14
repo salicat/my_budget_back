@@ -22,9 +22,8 @@ async def make_register(reg_in: RegIn, db: Session = Depends(get_db)):
     for cat in all_cats:        
         if cat.username == reg_in.username:
             user_cats.append(cat.category)
-    
-    if reg_in.category not in user_cats:
-        raise HTTPException(status_code=403, detail="no tienes una categoria " + reg_in.category)
+
+
     if reg_in.type == "incomes":
         cat_in_db.value = cat_in_db.value + reg_in.value 
         new_reg_in = RegsInDb(**reg_in.dict())

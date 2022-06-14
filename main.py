@@ -21,7 +21,7 @@ my_budget.add_middleware(
     allow_origins=["*"],
     allow_credentials=True, 
     allow_methods=["*"], 
-    allow_headers=[],
+    allow_headers=["*"],
 )
 
 my_budget.include_router(router_users)

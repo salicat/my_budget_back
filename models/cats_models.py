@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from datetime import date
 
 class CatIn(BaseModel):
+    id          : int
     category    : str
     type        : str
     username    : str
