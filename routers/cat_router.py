@@ -109,12 +109,9 @@ async def expire_cats(username: str, year: int, month: int, db:Session = Depends
 async def delete_cat(cat_del: CatDel, db: Session = Depends(get_db)):
     all_cats = db.query(CatsInDb).all() 
         
-    for cat in all_cats:
-        if cat.username == cat_del.username:
-            if cat.category == cat_del.category:
-                db.delete(cat)
-                db.commit()
-                db.flush(cat)
+    db.delete(cat_del)
+    db.commit(cat_del)
+    db.flush(cat_del)
 
     return { "message" : cat_del.category + " eliminada"}
     
