@@ -45,7 +45,6 @@ async def make_register(reg_in: RegIn, db: Session = Depends(get_db)):
         db.add(new_reg_in)
         db.commit()
         db.refresh(new_reg_in)
-            
     
     return {"Message" : "registro " + reg_in.category + " exitoso, valor : " + str(reg_in.value)}
 

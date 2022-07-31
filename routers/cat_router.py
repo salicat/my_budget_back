@@ -107,11 +107,10 @@ async def expire_cats(username: str, year: int, month: int, db:Session = Depends
 
 @router.delete("/user/delete/category/")
 async def delete_cat(cat_del: CatDel, db: Session = Depends(get_db)):
-    user_cats = db.query(CatsInDb).get(cat_del.category)
     all_cats = db.query(CatsInDb).all() 
         
     for cat in all_cats:
-        if cat_del.username == cat.username:
+        if cat.username == cat_del.username:
             if cat.category == cat_del.category:
                 db.delete(cat)
                 db.commit()
