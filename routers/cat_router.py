@@ -115,5 +115,6 @@ async def delete_cat(cat_del: CatDel, db: Session = Depends(get_db)):
                 db.delete(cat)
                 db.commit()
                 db.flush(cat)
-                
+
+    return { "message" : cat_del.category + " eliminada"}
     
