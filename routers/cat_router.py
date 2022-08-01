@@ -127,8 +127,7 @@ async def delete_cat(category: str, username: str, db: Session = Depends(get_db)
 
     for cat in all_cats:
         if username == cat.username:
-            if category == cat.category:
-                user_cats.append[cat]
+            user_cats.append[cat]
         return user_cats
 
     for each in user_cats:
@@ -136,5 +135,5 @@ async def delete_cat(category: str, username: str, db: Session = Depends(get_db)
             db.delete(cat)
             db.commit()
             db.flush(cat)
-
+    return{"message" : cat.category + "ha sido eliminada"}
     
