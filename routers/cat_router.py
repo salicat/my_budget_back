@@ -114,6 +114,7 @@ async def modify_cat(cat_update: CatUpDate, db: Session = Depends(get_db)):
         if cat_update.category == cat.category:
             if cat_update.username == cat.username:
                 cat.budget = cat_update.budget
+                cat.value = cat_update.value
                 modified.append(cat)
                 db.commit()
                 db.refresh(cat)
@@ -134,5 +135,3 @@ async def delete_cat(cat_del: CatDel, db : Session = Depends(get_db)):
             db.delete(reg)
             db.commit()
             db.flush(reg)
-
-    return user_cats

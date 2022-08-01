@@ -1,3 +1,4 @@
+from multiprocessing.sharedctypes import Value
 from pydantic import BaseModel
 from datetime import date
 
@@ -23,6 +24,7 @@ class CatUpDate(BaseModel):
     category    : str
     username    : str
     budget      : float
+    value       : float
 
 class CatOut(BaseModel):
     category    : str
