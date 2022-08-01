@@ -22,7 +22,7 @@ class CatTypes(BaseModel):
 class CatUpDate(BaseModel):
     category    : str
     username    : str
-    value       : float
+    budget      : float
 
 class CatOut(BaseModel):
     category    : str
