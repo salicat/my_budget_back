@@ -113,12 +113,13 @@ async def modify_cat(cat_update: CatUpDate, db: Session = Depends(get_db)):
     for cat in all_cats:
         if cat_update.category == cat.category:
             if cat_update.username == cat.username:
+                modified.append(cat)
                 cat.budget = cat_update.budget
                 cat.value = cat_update.value
-                modified.append(cat)
+                db.append(cat)
                 db.commit()
                 db.refresh(cat)
-    return modified
+    return {"message" + "Nuevo valor " + modified.value + " " + "Nuevo presupuesto" + modified.budget } 
     
 
 @router.delete("/user/delete/category/")
