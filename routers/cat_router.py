@@ -120,13 +120,15 @@ async def modify_cat(cat_update: CatUpDate, db: Session = Depends(get_db)):
     return modified
     
 
-@router.delete("/user/delete/category/")
-async def delete_cat(cat_del: CatDel, db: Session = Depends(get_db)):
+@router.delete("/user/delete/category/{category}/{username}/")
+async def delete_cat(category: str, username: str, db: Session = Depends(get_db)):
     all_cats = db.query(CatsInDb).all() 
-        
-    db.delete(cat_del)
-    db.commit(cat_del)
-    db.flush(cat_del)
 
-    return { "message" : cat_del.category + " eliminada"}
+    for cat in all_cats:
+        if username == cat.username and category == cat.category:
+            db.delete(cat)
+            db.commit()
+            db.flush(cat)
+
+    return { "message" : cat.category + " eliminada"}
     
