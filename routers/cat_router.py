@@ -128,8 +128,6 @@ async def delete_cat(cat_del: CatDel, db : Session = Depends(get_db)):
     for cat in all_cats:
         if cat_del.username == cat.username:
             user_cats.append(cat)
-        else:
-            return {"message" : "No tienes una categoria llamada " + cat_del.category}
     
     for reg in user_cats:
         if cat_del.category == reg.category:
