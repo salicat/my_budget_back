@@ -126,8 +126,9 @@ async def delete_cat(category: str, username: str, db: Session = Depends(get_db)
     user_cats = []
 
     for cat in all_cats:
-        if username == cat.username and category == cat.category:
-            user_cats.append[cat]
+        if username == cat.username:
+            if category == cat.category:
+                user_cats.append[cat]
         return user_cats
 
     for each in user_cats:
