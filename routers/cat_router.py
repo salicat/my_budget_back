@@ -129,7 +129,7 @@ async def delete_cat(category: str, username: str, db: Session = Depends(get_db)
         if username == cat.username and category == cat.category:
             user_cats.append[cat]
         else:
-            return {"message" : "No existe exa categoria en tu usuario"}
+            return {"message" : "No existe exa categoria en tu usuario" + " " + cat}
 
     for each in user_cats:
         if category == each.category and username == each.username:
