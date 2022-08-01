@@ -123,9 +123,16 @@ async def modify_cat(cat_update: CatUpDate, db: Session = Depends(get_db)):
 @router.delete("/user/delete/category/{category}/{username}/")
 async def delete_cat(category: str, username: str, db: Session = Depends(get_db)):
     all_cats = db.query(CatsInDb).all() 
+    user_cats = []
 
     for cat in all_cats:
         if username == cat.username and category == cat.category:
+            user_cats.append[cat]
+        else:
+            return {"message" : "No existe exa categoria en tu usuario"}
+
+    for each in user_cats:
+        if category == each.category and username == each.username:
             db.delete(cat)
             db.commit()
             db.flush(cat)

@@ -23,7 +23,6 @@ class RegDel(BaseModel):
     id          : list
     username    : str
 
-
 class RegOut(BaseModel):
     username    : str
     date        : date
