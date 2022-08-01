@@ -120,6 +120,7 @@ async def modify_cat(cat_update: CatUpDate, db: Session = Depends(get_db)):
                 db.commit()
                 db.refresh(cat)
     return modified
+    
 
 @router.delete("/user/delete/category/")
 async def delete_cat(cat_del: CatDel, db : Session = Depends(get_db)):
