@@ -130,8 +130,4 @@ async def delete_cat(cat_del: CatDel, db : Session = Depends(get_db)):
             user_cats.append[cat]    
         for each in user_cats:
             if cat_del.category == each.category:
-                db.delete(cat)
-                db.commit()
-                db.flush(cat)
-        return{"message" : cat.category + "ha sido eliminada"}
-    
+                return each
