@@ -111,13 +111,9 @@ async def modify_cat(cat_update: CatUpDate, db: Session = Depends(get_db)):
     modified = []
 
     for cat in all_cats:
+        if cat_update.category == cat.category:
             if cat_update.username == cat.username:
                 cat.budget = cat_update.budget
-                modified.append(cat)
-                db.commit()
-                db.refresh(cat)
-            if cat_update.category != cat.category:
-                cat.category = cat_update.category
                 modified.append(cat)
                 db.commit()
                 db.refresh(cat)
