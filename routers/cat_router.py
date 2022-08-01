@@ -105,6 +105,20 @@ async def expire_cats(username: str, year: int, month: int, db:Session = Depends
 
     return per_value
 
+@router.patch("/user/modify/category/")
+async def modify_cat(cat_update: CatUpDate, db: Session = Depends(get_db)):
+    all_cats = db.query(CatsInDb).all()
+    modified = []
+
+    for cat in all_cats:
+        if cat_update.category == cat.category:
+            if cat_update.username == cat.username:
+                modified.append(cat)
+                db.commit()
+                db.refresh(cat)
+    return modified
+        
+
 @router.delete("/user/delete/category/")
 async def delete_cat(cat_del: CatDel, db: Session = Depends(get_db)):
     all_cats = db.query(CatsInDb).all() 
