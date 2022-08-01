@@ -125,7 +125,4 @@ async def delete_cat(cat_del: CatDel, db : Session = Depends(get_db)):
     all_cats = db.query(CatsInDb).all() 
     user_cats = []
 
-    for cat in all_cats:
-        if cat_del.username == cat.username:
-            user_cats.append[cat]    
-        return user_cats
+    return all_cats
