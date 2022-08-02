@@ -116,7 +116,6 @@ async def modify_cat(cat_update: CatUpDate, db: Session = Depends(get_db)):
                 cat.budget = cat_update.budget
                 cat.value = cat_update.value
                 modified.append(cat)
-                db.add(cat)
                 db.commit()
                 db.refresh(cat)
     return modified
