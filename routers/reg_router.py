@@ -125,23 +125,17 @@ async def del_record(reg_del:RegDel, db: Session = Depends(get_db)):
 
 @router.get("user/track/")
 async def track_months(reg_track: RegTrack, db: Session = Depends(get_db)):
-    regs        = db.query(RegsInDb).all()    
-    cats        = db.query(CatsInDb).all()    
-    meses       = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 
+    regs = db.query(RegsInDb).all()    
+    cats = db.query(CatsInDb).all()    
+    meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 
                     'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 
                     'Noviembre', 'Diciembre']
-    user_cats   = []
-    value       =  0
+    user_cats = []
+    value =  0
 
     for cat in cats:
         if cat.username == reg_track.username:                        
             if cat.type == "expenses":
-                user_cats.append({cat.category :[   [meses[reg_track.month-1], value],
-                                                    [meses[reg_track.month-2], value],
-                                                    [meses[reg_track.month-3], value],
-                                                    [meses[reg_track.month-4], value],
-                                                    [meses[reg_track.month-5], value],
-                                                    [meses[reg_track.month-6], value]
-                                                ]
+                user_cats.append({"message" : "A ver asi hijueputa!"
                                 })
     return user_cats
