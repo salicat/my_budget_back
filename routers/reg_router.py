@@ -126,36 +126,29 @@ async def del_record(reg_del:RegDel, db: Session = Depends(get_db)):
 @router.get("user/track/{username}/{month}/{category}")
 async def track_months(username: str, month: int, category: str, db: Session = Depends(get_db)):
     regs = db.query(RegsInDb).all()    
-    user_cats   = []
     cats        = db.query(CatsInDb).all()    
     meses       = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 
                     'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 
                     'Noviembre', 'Diciembre']
-    value       =   int
-    track       = {category : [ [meses[month+1], value],
-                                [meses[month], value],
-                                [meses[month-1], value],
-                                [meses[month-2], value],
-                                [meses[month-3], value],
-                                [meses[month-4], value]
-                                ]}
-
+    user_cats   = []
+    value       =  0
+    
     for cat in cats:
-        if username == cat.username:                        
+        if cat.username == username:                        
             if cat.type == "expenses":
-                user_cats.append({category :[   [meses[month+1], value],
-                                                [meses[month], value],
-                                                [meses[month-1], value],
-                                                [meses[month-2], value],
-                                                [meses[month-3], value],
-                                                [meses[month-4], value]
-                                            ]
+                user_cats.append({cat.category :[   [meses[month+1], value],
+                                                    [meses[month], value],
+                                                    [meses[month-1], value],
+                                                    [meses[month-2], value],
+                                                    [meses[month-3], value],
+                                                    [meses[month-4], value]
+                                                ]
                                 })
-                                
+
     for reg in regs:
         if reg.date.month == month:
             for cat in user_cats:
-                if reg.category in cat["category"]:       
-                    cat.category[meses[month+1]] = cat.category[meses[month+1]] + reg.value                                                 
+                if reg.category in cat.category:       
+                    cat.category[0][1] = cat.category[0][1] + reg.value                                                 
     
     return user_cats
