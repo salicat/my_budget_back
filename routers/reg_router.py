@@ -145,10 +145,5 @@ async def track_months(username: str, month: int, category: str, db: Session = D
                                                 ]
                                 })
 
-    for reg in regs:
-        if reg.date.month == month:
-            for cat in user_cats:
-                if reg.category in cat.category:       
-                    cat.category[0][1] = cat.category[0][1] + reg.value                                                 
     
     return user_cats
