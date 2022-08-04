@@ -142,6 +142,6 @@ async def track_months(reg_track: RegTrack, db: Session = Depends(get_db)):
                                                     [meses[reg_track.month-4], value],
                                                     [meses[reg_track.month-5], value],
                                                     [meses[reg_track.month-6], value]
-                                                ]"
+                                                ]
                                 })
     return user_cats
