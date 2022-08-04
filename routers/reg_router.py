@@ -9,7 +9,7 @@ from db.db_connection import get_db
 from db.users_db import UserInDB
 from db.regs_db import RegsInDb
 from db.cats_db import CatsInDb
-from models.reg_models import RegIn, RegConsult, RegDel, RegOut
+from models.reg_models import RegIn, RegConsult, RegDel, RegOut, RegTrack
 from models.user_models import UserOut, UserIn
 
 router = APIRouter()
@@ -123,9 +123,9 @@ async def del_record(reg_del:RegDel, db: Session = Depends(get_db)):
 
     return len(user_regs)
 
-@router.get("user/track/{username}/{month}/{category}")
-async def track_months(username: str, month: int, category: str, db: Session = Depends(get_db)):
-    regs = db.query(RegsInDb).all()    
+@router.get("user/track/")
+async def track_months(reg_track: RegTrack, db: Session = Depends(get_db)):
+    regs        = db.query(RegsInDb).all()    
     cats        = db.query(CatsInDb).all()    
     meses       = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 
                     'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 
@@ -134,16 +134,14 @@ async def track_months(username: str, month: int, category: str, db: Session = D
     value       =  0
 
     for cat in cats:
-        if cat.username == username:                        
+        if cat.username == reg_track.username:                        
             if cat.type == "expenses":
-                user_cats.append({cat.category :[   [meses[month-1], value],
-                                                    [meses[month-2], value],
-                                                    [meses[month-3], value],
-                                                    [meses[month-4], value],
-                                                    [meses[month-5], value],
-                                                    [meses[month-6], value]
+                user_cats.append({cat.category :[   [meses[reg_track.month-1], value],
+                                                    [meses[reg_track.month-2], value],
+                                                    [meses[reg_track.month-3], value],
+                                                    [meses[reg_track.month-4], value],
+                                                    [meses[reg_track.month-5], value],
+                                                    [meses[reg_track.month-6], value]
                                                 ]
                                 })
-
-    
     return user_cats

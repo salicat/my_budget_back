@@ -1,4 +1,6 @@
+from calendar import month
 from pickletools import float8
+from unicodedata import category
 from pydantic import BaseModel
 from datetime import date
 
@@ -22,6 +24,11 @@ class RegMonth(BaseModel):
 class RegDel(BaseModel):
     id          : list
     username    : str
+
+class RegTrack(BaseModel):
+    username    : str
+    month       : int
+    category    : str
 
 class RegOut(BaseModel):
     username    : str
