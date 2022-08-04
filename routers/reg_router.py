@@ -130,12 +130,5 @@ async def track_months(reg_track: RegTrack, db: Session = Depends(get_db)):
     meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 
                     'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 
                     'Noviembre', 'Diciembre']
-    user_cats = []
-    value =  0
-
-    for cat in cats:
-        if cat.username == reg_track.username:                        
-            if cat.type == "expenses":
-                user_cats.append({"message" : "A ver asi hijueputa!"
-                                })
-    return user_cats
+    
+    return regs
