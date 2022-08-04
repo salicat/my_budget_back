@@ -132,16 +132,16 @@ async def track_months(username: str, month: int, category: str, db: Session = D
                     'Noviembre', 'Diciembre']
     user_cats   = []
     value       =  0
-    
+
     for cat in cats:
         if cat.username == username:                        
             if cat.type == "expenses":
-                user_cats.append({cat.category :[   [meses[month+1], value],
-                                                    [meses[month], value],
-                                                    [meses[month-1], value],
+                user_cats.append({cat.category :[   [meses[month-1], value],
                                                     [meses[month-2], value],
                                                     [meses[month-3], value],
-                                                    [meses[month-4], value]
+                                                    [meses[month-4], value],
+                                                    [meses[month-5], value],
+                                                    [meses[month-6], value]
                                                 ]
                                 })
 
