@@ -123,7 +123,7 @@ async def del_record(reg_del:RegDel, db: Session = Depends(get_db)):
 
     return len(user_regs)
 
-@router.get("user/track/")
+@router.get("user/track/{username}/{month}/{category}")
 async def track_months(username: str, month: int, category: str, db: Session = Depends(get_db)):
     regs = db.query(RegsInDb).all()    
     user_cats   = []
