@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from multiprocessing.sharedctypes import Value
 from typing import List
 from fastapi import Depends, APIRouter, HTTPException
 from sqlalchemy.orm import Session
@@ -121,3 +122,40 @@ async def del_record(reg_del:RegDel, db: Session = Depends(get_db)):
             db.refresh(user_in_db)
 
     return len(user_regs)
+
+@router.get("user/track/")
+async def track_months(username: str, month: int, category: str, db: Session = Depends(get_db)):
+    regs = db.query(RegsInDb).all()    
+    user_cats   = []
+    cats        = db.query(CatsInDb).all()    
+    meses       = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 
+                    'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 
+                    'Noviembre', 'Diciembre']
+    value       =   int
+    track       = {category : [ [meses[month+1], value],
+                                [meses[month], value],
+                                [meses[month-1], value],
+                                [meses[month-2], value],
+                                [meses[month-3], value],
+                                [meses[month-4], value]
+                                ]}
+
+    for cat in cats:
+        if username == cat.username:                        
+            if cat.type == "expenses":
+                user_cats.append({category :[   [meses[month+1], value],
+                                                [meses[month], value],
+                                                [meses[month-1], value],
+                                                [meses[month-2], value],
+                                                [meses[month-3], value],
+                                                [meses[month-4], value]
+                                            ]
+                                })
+                                
+    for reg in regs:
+        if reg.date.month == month:
+            for cat in user_cats:
+                if reg.category in cat["category"]:       
+                    cat.category[meses[month+1]] = cat.category[meses[month+1]] + reg.value                                                 
+    
+    return user_cats
