@@ -135,7 +135,7 @@ async def track_months(reg_track: RegTrack, db: Session = Depends(get_db)):
 
     for cat in cats:
         if cat.username == reg_track.username:                        
-            if cat.type == "expenses":
+            if cat.category == reg_track.category:
                 user_cats.append({cat.category :[   [meses[reg_track.month-1], value],
                                                     [meses[reg_track.month-2], value],
                                                     [meses[reg_track.month-3], value],
