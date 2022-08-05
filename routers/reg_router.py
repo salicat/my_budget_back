@@ -148,16 +148,16 @@ async def track_months(username: str, month:int, category:str, db: Session = Dep
     for reg in regs:
         if reg.username == username:
             if reg.date.month == month-1:
-                user_cats[0][value] = user_cats[0][value] + reg.value
+                user_cats[0][category][0][1] = user_cats[0][category][0][1] + reg.value
             if reg.date.month == month-2:
-                user_cats[1][value] = user_cats[1][value] + reg.value
+                user_cats[0][category][1][1] = user_cats[0][category][1][1] + reg.value
             if reg.date.month == month-3:
-                user_cats[2][value] = user_cats[2][value] + reg.value
+                user_cats[0][category][2][1] = user_cats[0][category][2][1] + reg.value
             if reg.date.month == month-4:
-                user_cats[3][value] = user_cats[3][value] + reg.value
+                user_cats[0][category][3][1] = user_cats[0][category][3][1] + reg.value
             if reg.date.month == month-5:
-                user_cats[4][value] = user_cats[4][value] + reg.value
-            if reg.date.month == month-6:
-                user_cats[5][value] = user_cats[5][value] + reg.value
-
+                user_cats[0][category][4][1] = user_cats[0][category][4][1] + reg.value
+            if reg.date.month == month-5:
+                user_cats[0][category][5][1] = user_cats[0][category][5][1] + reg.value
+            
     return user_cats[0][category]
