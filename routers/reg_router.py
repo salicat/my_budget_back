@@ -141,7 +141,9 @@ async def track_months(username: str, month:int, category:str, db: Session = Dep
                                                     [meses[month-3], value],
                                                     [meses[month-4], value],
                                                     [meses[month-5], value],
-                                                    [meses[month-6], value]
+                                                    [meses[month-6], value],
+                                                    [meses[month-7], value],
+                                                    [meses[month-8], value]
                                                 ]
                                 })
 
@@ -157,9 +159,11 @@ async def track_months(username: str, month:int, category:str, db: Session = Dep
                 user_cats[0][category][3][1] = user_cats[0][category][3][1] + reg.value
             if reg.date.month == month-5:
                 user_cats[0][category][4][1] = user_cats[0][category][4][1] + reg.value
-            if reg.date.month == month-5:
+            if reg.date.month == month-6:
                 user_cats[0][category][5][1] = user_cats[0][category][5][1] + reg.value
-    for i in user_cats[0][category]:
-        reversed (user_cats[0][category])
+            if reg.date.month == month-7:
+                user_cats[0][category][6][1] = user_cats[0][category][6][1] + reg.value
+            if reg.date.month == month-8:
+                user_cats[0][category][7][1] = user_cats[0][category][7][1] + reg.value
 
-    return user_cats[0][category]
+    return reversed (user_cats[0][category])
