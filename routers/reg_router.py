@@ -159,5 +159,7 @@ async def track_months(username: str, month:int, category:str, db: Session = Dep
                 user_cats[0][category][4][1] = user_cats[0][category][4][1] + reg.value
             if reg.date.month == month-5:
                 user_cats[0][category][5][1] = user_cats[0][category][5][1] + reg.value
-            
+    for i in user_cats[0][category]:
+        reversed (user_cats[0][category])
+
     return user_cats[0][category]
