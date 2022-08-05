@@ -126,6 +126,7 @@ async def del_record(reg_del:RegDel, db: Session = Depends(get_db)):
 @router.get("/user/track/{username}/{month}/{category}")
 async def track_months(username: str, month:int, category:str, db: Session = Depends(get_db)):
     cats = db.query(CatsInDb).all()    
+    regs = db.query(RegsInDb).all()
     meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 
                     'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 
                     'Noviembre', 'Diciembre']
@@ -143,4 +144,20 @@ async def track_months(username: str, month:int, category:str, db: Session = Dep
                                                     [meses[month-6], value]
                                                 ]
                                 })
+
+    for reg in regs:
+        if reg.username == username:
+            if reg.date.month == month-1:
+                user_cats[0][value] = user_cats[0][value] + reg.value
+            if reg.date.month == month-2:
+                user_cats[1][value] = user_cats[1][value] + reg.value
+            if reg.date.month == month-3:
+                user_cats[2][value] = user_cats[2][value] + reg.value
+            if reg.date.month == month-4:
+                user_cats[3][value] = user_cats[3][value] + reg.value
+            if reg.date.month == month-5:
+                user_cats[4][value] = user_cats[4][value] + reg.value
+            if reg.date.month == month-6:
+                user_cats[5][value] = user_cats[5][value] + reg.value
+
     return user_cats[0][category]
