@@ -143,4 +143,4 @@ async def track_months(username: str, month:int, category:str, db: Session = Dep
                                                     [meses[month-6], value]
                                                 ]
                                 })
-    return user_cats
+    return user_cats[0][category]
