@@ -148,22 +148,23 @@ async def track_months(username: str, month:int, category:str, db: Session = Dep
                                 })
 
     for reg in regs:
-        if reg.username == username:
-            if reg.date.month == month-8:
-                user_cats[0][category][0][1] = user_cats[0][category][0][1] + reg.value
-            if reg.date.month == month-7:
-                user_cats[0][category][1][1] = user_cats[0][category][1][1] + reg.value
-            if reg.date.month == month-6:
-                user_cats[0][category][2][1] = user_cats[0][category][2][1] + reg.value
-            if reg.date.month == month-5:
-                user_cats[0][category][3][1] = user_cats[0][category][3][1] + reg.value
-            if reg.date.month == month-4:
-                user_cats[0][category][4][1] = user_cats[0][category][4][1] + reg.value
-            if reg.date.month == month-3:
-                user_cats[0][category][5][1] = user_cats[0][category][5][1] + reg.value
-            if reg.date.month == month-2:
-                user_cats[0][category][6][1] = user_cats[0][category][6][1] + reg.value
-            if reg.date.month == month-1:
-                user_cats[0][category][7][1] = user_cats[0][category][7][1] + reg.value
+        if reg.category == category:
+            if reg.username == username:
+                if reg.date.month == month-8:
+                    user_cats[0][category][0][1] = user_cats[0][category][0][1] + reg.value
+                if reg.date.month == month-7:
+                    user_cats[0][category][1][1] = user_cats[0][category][1][1] + reg.value
+                if reg.date.month == month-6:
+                    user_cats[0][category][2][1] = user_cats[0][category][2][1] + reg.value
+                if reg.date.month == month-5:
+                    user_cats[0][category][3][1] = user_cats[0][category][3][1] + reg.value
+                if reg.date.month == month-4:
+                    user_cats[0][category][4][1] = user_cats[0][category][4][1] + reg.value
+                if reg.date.month == month-3:
+                    user_cats[0][category][5][1] = user_cats[0][category][5][1] + reg.value
+                if reg.date.month == month-2:
+                    user_cats[0][category][6][1] = user_cats[0][category][6][1] + reg.value
+                if reg.date.month == month-1:
+                    user_cats[0][category][7][1] = user_cats[0][category][7][1] + reg.value
 
     return user_cats[0][category]
