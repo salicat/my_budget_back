@@ -97,9 +97,10 @@ async def expire_cats(username: str, year: int, month: int, db:Session = Depends
     for reg in regs:
         if reg.date.month == month:
             if reg.date.year == year:
-                for cat in user_cats:
-                    if reg.category == cat["name"]:
-                        cat["value"] = cat["value"] + reg.value    
+                if reg.username == username:
+                    for cat in user_cats:
+                        if reg.category == cat["name"]:
+                            cat["value"] = cat["value"] + reg.value    
     
     per_value = sorted(user_cats, key= lambda x:x['value'], reverse=True)
 
