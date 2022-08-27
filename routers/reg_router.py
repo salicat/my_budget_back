@@ -171,22 +171,19 @@ async def track_months(username: str, month:int, category:str, db: Session = Dep
 
 @router.get("/user/incomes/{username}/{month}/")
 async def user_incomes(username : str, month: int, db: Session = Depends(get_db)):
-    user_regs = db.query(RegsInDb).get(username)
+    regs = db.query(RegsInDb).get(all)
     user_incomes = []
     user_expenses = []
     meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 
                     'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 
                     'Noviembre', 'Diciembre']
     
-    for u in user_regs:
+    for u in regs:
         if username == u.username:
             if u.type == "incomes":
                 user_incomes.append(u)
             elif u.type == "expenses":
                 user_expenses.append(u)
-
-   
-
 
     return {"espenses": user_expenses,
             "incomes" : user_incomes}
