@@ -132,7 +132,7 @@ async def delete_cat(cat_del: CatDel, db : Session = Depends(get_db)):
             user_cats.append(cat)
     
     for reg in user_cats:
-        if cat_del.type == reg.type:
+        if cat_del.category == reg.category:
             db.delete(reg)
             db.commit()
             db.flush(reg)
