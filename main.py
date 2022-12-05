@@ -13,6 +13,7 @@ origins = [
     "https://localhost.tiangolo.com",
     "http://localhost:8080", 
     "http://localhost:8000", 
+    "https://my-budget-back.vercel.app",
     "https://mybudgetvue.herokuapp.com"
 ]
 
