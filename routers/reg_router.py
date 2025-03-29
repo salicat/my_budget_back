@@ -35,15 +35,39 @@ logging.basicConfig(
     handlers=[logging.StreamHandler()]
 )
 
+HEADER_KEYWORDS = {
+    "precio", "importe", "descripción", "unidad", "(€)", "ticket", "caja", "centro",
+    "cif", "subtotal", "impuesto", "base imponible", "iva", "cuota", "nif", "factura",
+    "hora", "fecha", "op:", "nº", "operation", "contactless", "verific", "tarjeta..bancaria",
+    "pvp", "pvp/unit"
+}
+
+STORE_KEYWORDS = {
+    "mercadona", "starbucks", "grupo dia", "dia", "pet r", "petrer", "cl guadari", "amorebieta",
+    "kuta", "bali", "feedback", "address", "avda.", "telefono", "teléfono"
+}
+
+PAYMENT_KEYWORDS = {
+    "tarjeta", "efectivo", "pago", "credit", "debit", "card", "cash", "bancaria", "mastercard",
+    "visa"
+}
+
+
 def extract_price(value: str) -> float:
-    """Convierte un string numérico a float usando el último separador como decimal."""
-    # Elimina cualquier caracter que no sea dígito, coma o punto
-    value = re.sub(r'[^\d.,]', '', value)
-    # Si hay coma y punto, asumimos formato europeo (ej: 1.000,00 → 1000.00)
+    """
+    Convierte un string numérico a float usando el último separador como decimal.
+    Maneja posibles formatos como:
+      - "1,000.00"
+      - "1000,00"
+      - "1.000,00"
+      - "62,000" (caso Starbucks, 62 mil)
+    """
+    value = re.sub(r'[^\d.,]', '', value)  # Elimina caracteres no deseados
     if ',' in value and '.' in value:
+        # Caso europeo: 1.000,00 -> 1000.00
         value = value.replace('.', '').replace(',', '.')
-    # Si solo hay coma, se asume como separador decimal a menos que el segmento posterior tenga 3 dígitos (posible separador de miles)
     elif ',' in value:
+        # Si la parte final tras la coma tiene 3 dígitos, se asume separador de miles
         partes = value.split(',')
         if len(partes[-1]) == 3:
             value = ''.join(partes)
@@ -54,97 +78,95 @@ def extract_price(value: str) -> float:
     except Exception:
         return 0.0
 
+def is_line_irrelevant(line: str) -> bool:
+    """
+    Determina si una línea se considera irrelevante porque contiene
+    datos de cabecera, direcciones, CIF, etc.
+    """
+    l = line.lower()
+    # Marcar como irrelevante si coincide con alguna palabra clave
+    if any(k in l for k in HEADER_KEYWORDS):
+        return True
+    if any(k in l for k in STORE_KEYWORDS):
+        return True
+    return False
+
 def parse_products(lines: List[str]) -> List[Dict[str, Any]]:
     """
-    Procesa las líneas extraídas por OCR y devuelve una lista de diccionarios
-    con los datos de cada producto (cantidad, nombre y precio).
-    
-    La función detecta el precio buscando el último número en la línea que contenga
-    separador (coma o punto). Se asume que si la línea inicia con dígitos, estos son la cantidad.
-    Si no se encuentra cantidad se asigna 1 por defecto.
-    La información se arma de forma independiente al formato del ticket.
+    Procesa las líneas para extraer artículos con (cantidad, nombre, precio).
+    Se asume que:
+      - Si una línea comienza con dígitos, se interpretan como cantidad (p.ej. "2 SOJA NATURAL").
+      - Si no hay cantidad, se asume 1.
+      - El precio se extrae del último número que tenga coma o punto (ej: "1,99" o "62,000").
+      - Si se detecta la palabra 'total' en la línea, se asume fin de productos.
     """
     products = []
     current_product: Dict[str, Any] = {}
-
-    # Lista de palabras de cabecera que pueden ayudar a identificar que no es producto
-    header_keywords = ["precio", "importe", "descripción", "unidad", "(€)", "total", "ticket", "caja", "centro", "cif"]
-
-    def is_header(line: str) -> bool:
-        for word in header_keywords:
-            if word.lower() in line.lower():
-                return True
-        return False
 
     for line in lines:
         line_clean = line.strip()
         if not line_clean:
             continue
-        # Si la línea es un encabezado o contiene "total" (se ignora la parte final del ticket)
-        if is_header(line_clean):
-            if "total" in line_clean.lower():
-                # Se finaliza la lectura al encontrar "total" (se asume fin de productos)
-                break
+
+        # Si la línea contiene la palabra "total", asumimos que ya no hay más productos
+        if "total" in line_clean.lower():
+            break
+
+        # Saltar líneas irrelevantes
+        if is_line_irrelevant(line_clean):
             continue
 
-        # Caso 1: Línea que inicia con cantidad y nombre (ej: "2 SOJA NATURAL")
+        # Caso 1: Línea que inicia con cantidad y algo más (ej: "2 SOJA NATURAL")
         match = re.match(r'^(\d+)\s+(.+)$', line_clean)
         if match:
-            # Si hay un producto en curso sin precio, lo finalizamos con precio 0.0
+            # Si había un producto en curso sin precio, cerrarlo
             if current_product and "price" not in current_product:
                 current_product.setdefault("quantity", 1)
-                current_product.setdefault("name", "")
+                current_product.setdefault("name", "Sin nombre")
                 current_product["price"] = 0.0
                 products.append(current_product)
                 current_product = {}
-            qty, name = match.groups()
+
+            qty, name_part = match.groups()
             current_product["quantity"] = int(qty)
-            current_product["name"] = name.strip()
-            # Revisar si en la misma línea hay un precio al final (número con separador)
-            price_matches = re.findall(r'(\d+(?:[.,]\d+)+)', line_clean)
-            if price_matches:
-                # Tomar el último valor como precio
-                price_str = price_matches[-1]
+            current_product["name"] = name_part.strip()
+
+            # Verificar si en la misma línea viene un precio
+            price_candidates = re.findall(r'(\d+(?:[.,]\d+)+)', line_clean)
+            if price_candidates:
+                price_str = price_candidates[-1]  # último valor
                 current_product["price"] = extract_price(price_str)
                 products.append(current_product)
                 current_product = {}
             continue
 
-        # Caso 2: Línea que es solo un número (posible cantidad o precio)
-        if re.fullmatch(r'\d+', line_clean):
-            # Si no hay cantidad definida, asignar como cantidad
-            if "quantity" not in current_product:
-                current_product["quantity"] = int(line_clean)
-            else:
-                # Si ya existe cantidad, quizá se trate de un precio sin separador,
-                # pero como no cumple el formato (falta separador), se ignora.
-                pass
-            continue
-
-        # Caso 3: Línea que contiene un número con separador (precio)
+        # Caso 2: Línea con un posible precio (buscamos el último número con separador)
         price_candidates = re.findall(r'(\d+(?:[.,]\d+)+)', line_clean)
         if price_candidates:
-            price_str = price_candidates[-1]  # Usar el último valor encontrado
-            current_product["price"] = extract_price(price_str)
-            # Si no se tenía cantidad, se asume 1
+            # Extraemos el precio y el resto lo consideramos nombre
+            price_str = price_candidates[-1]
+            price_val = extract_price(price_str)
+
+            # Si no hay cantidad, asumimos 1
             if "quantity" not in current_product:
                 current_product["quantity"] = 1
-            # Si no se tenía nombre, se asume que el resto de la línea (sin el precio) es el nombre
+
+            # Si no hay nombre, el resto de la línea (sin el precio) es el nombre
             if "name" not in current_product or not current_product["name"]:
-                # Remover el precio de la línea y limpiar
                 name_candidate = re.sub(r'(\d+(?:[.,]\d+)+)\s*$', '', line_clean).strip()
                 current_product["name"] = name_candidate if name_candidate else "Sin nombre"
+
+            current_product["price"] = price_val
             products.append(current_product)
             current_product = {}
-            continue
-
-        # Caso 4: Línea que es texto y se asume parte del nombre del producto
-        if "name" in current_product:
-            current_product["name"] += " " + line_clean
         else:
-            current_product["name"] = line_clean
+            # Caso 3: Si no se encontró precio, asumimos que es parte del nombre
+            if "name" in current_product:
+                current_product["name"] += " " + line_clean
+            else:
+                current_product["name"] = line_clean
 
-    # Si queda un producto sin precio asignado, se finaliza con precio 0.0
+    # Si al final queda un producto sin precio, cerrarlo con precio 0
     if current_product:
         current_product.setdefault("quantity", 1)
         current_product.setdefault("name", "Sin nombre")
@@ -152,6 +174,40 @@ def parse_products(lines: List[str]) -> List[Dict[str, Any]]:
         products.append(current_product)
 
     return products
+
+def find_ticket_total(lines: List[str]) -> float:
+    """
+    Busca el valor total en las líneas. Recorre de abajo hacia arriba
+    y si encuentra la palabra "total" (o "grand total"), intenta extraer
+    el valor en la misma línea o en las siguientes 2 líneas.
+    Evita líneas que tengan "subtotal", "base imponible", "iva", etc.
+    """
+    exclude_if_contains = {"subtotal", "imponible", "iva", "impuesto", "tax", "cuota"}
+    for i in range(len(lines) - 1, -1, -1):
+        line = lines[i].strip().lower()
+        if "total" in line or "grand total" in line:
+            # Omitir si es "subtotal", "iva", etc.
+            if any(word in line for word in exclude_if_contains):
+                continue
+
+            # Intentar extraer el número en la misma línea
+            matches = re.findall(r'\d+(?:[.,]\d+)+', line)
+            if matches:
+                return extract_price(matches[-1])
+
+            # Si no hay número en la misma línea, mirar 1-2 líneas siguientes
+            for j in range(i + 1, min(i + 3, len(lines))):
+                next_line = lines[j].strip().lower()
+                # Evitar líneas irrelevantes de subtotales/impuestos
+                if any(word in next_line for word in exclude_if_contains):
+                    continue
+                # Buscar precios
+                matches_next = re.findall(r'\d+(?:[.,]\d+)+', next_line)
+                if matches_next:
+                    return extract_price(matches_next[-1])
+
+    return 0.0
+
 
 def google_vision_ocr(image_content: bytes) -> List[str]:
     try:
@@ -183,6 +239,26 @@ def google_vision_ocr(image_content: bytes) -> List[str]:
         logging.error(f"Error en google_vision_ocr: {str(e)}")
         raise
 
+def extract_total(lines: List[str]) -> float:
+    payment_keywords = {'tarjeta', 'efectivo', 'pago', 'credit', 'debit', 'card', 'cash', 'bancaria'}
+    for i in range(len(lines)):
+        line_clean = lines[i].strip().lower()
+        if "total" in line_clean:
+            # Verificar las siguientes 2 líneas para palabras clave de pago
+            for j in range(i + 1, min(i + 3, len(lines))):
+                next_line_clean = lines[j].strip().lower()
+                if any(keyword in next_line_clean for keyword in payment_keywords):
+                    numbers = re.findall(r'\d+[\.,]\d+', line_clean)
+                    if numbers:
+                        return extract_price(numbers[-1])
+    # Búsqueda inversa si no se encuentra
+    for line in reversed(lines):
+        line_clean = line.strip().lower()
+        if "total" in line_clean:
+            numbers = re.findall(r'\d+[\.,]\d+', line_clean)
+            if numbers:
+                return extract_price(numbers[-1])
+    return 0.0
 
 @router.post("/user/register/")
 async def make_register(reg_in: RegIn, db: Session = Depends(get_db)):
@@ -357,14 +433,19 @@ async def user_incomes(username : str, month: int, db: Session = Depends(get_db)
 async def process_receipt(
     username: str,
     image: UploadFile = File(...),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db), 
 ):
+
     try:
+        # Validar tipo de archivo
         if not image.content_type.startswith("image/"):
-            raise HTTPException(400, "Solo imágenes JPEG/PNG")
-        
+            raise HTTPException(400, "Solo se permiten imágenes JPEG/PNG")
+
+        # Leer y codificar la imagen
         image_content = await image.read()
         encoded_image = base64.b64encode(image_content).decode("utf-8")
+
+        # Llamar a Google Vision
         response = requests.post(
             f"{GOOGLE_VISION_URL}?key={API_KEY}",
             json={
@@ -375,47 +456,40 @@ async def process_receipt(
             }
         )
         response.raise_for_status()
+
+        # Extraer texto
         full_text = response.json()["responses"][0]["textAnnotations"][0]["description"]
         logging.info(f"=== TEXTO OCR ===\n{full_text}")
 
+        # Separar por líneas
         lines = full_text.split('\n')
+
+        # 1. Extraer productos
         products = parse_products(lines)
 
+        # 2. Construir registros
         registros = []
         for prod in products:
             registros.append({
                 "username": username,
                 "date": date.today().isoformat(),
                 "type": "expenses",
-                "category": "Otros",
+                "category": "",  # se puede asignar luego
                 "description": f"{prod.get('quantity', 1)}x {prod.get('name', 'Sin nombre')}",
                 "value": prod.get("price", 0.0) * prod.get("quantity", 1)
             })
 
-        user_categories = db.query(CatsInDb.category).filter(
-            CatsInDb.username == username
-        ).all()
-        user_categories = [cat[0] for cat in user_categories]
-        
-        for registro in registros:
-            for cat in user_categories:
-                if cat.lower() in registro["description"].lower():
-                    registro["category"] = cat
-                    break
-
-        total = None
-        for line in lines:
-            line_clean = line.strip().lower()
-            if "total" in line_clean:
-                numeros = re.findall(r'\d+(?:[.,]\d+)+', line_clean)
-                if numeros:
-                    total = extract_price(numeros[-1])
-                    break
-
-        if total is not None:
-            suma_calculada = sum(item["value"] for item in registros)
-            if abs(suma_calculada - total) > 2.0:
-                logging.warning(f"⚠️ Validación fallida: Total ({total}) vs Calculado ({suma_calculada})")
+        # 3. Buscar total del ticket
+        total = find_ticket_total(lines)
+        # Agregarlo como un registro "Total Compra" (opcional, según tu lógica)
+        registros.append({
+            "username": username,
+            "date": date.today().isoformat(),
+            "type": "expenses",
+            "category": "",
+            "description": "Total Compra",
+            "value": total
+        })
 
         return registros
 
