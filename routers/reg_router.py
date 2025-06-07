@@ -209,6 +209,7 @@ def find_ticket_total(lines: List[str]) -> float:
     return 0.0
 
 
+
 def google_vision_ocr(image_content: bytes) -> List[str]:
     try:
         encoded_image = base64.b64encode(image_content).decode("utf-8")
@@ -220,7 +221,7 @@ def google_vision_ocr(image_content: bytes) -> List[str]:
                     "features": [{"type": "TEXT_DETECTION"}]
                 }]
             }
-        )
+        ) 
         response.raise_for_status()
         full_text = response.json()["responses"][0]["textAnnotations"][0]["description"]
         logging.info(f"Texto detectado:\n{full_text}")
@@ -291,7 +292,6 @@ async def make_register(reg_in: RegIn, db: Session = Depends(get_db)):
         db.add(new_reg_in)
         db.commit()
         db.refresh(new_reg_in)
-    
     return {"Message" : "registro " + reg_in.category + " exitoso, valor : " + str(reg_in.value)}
 
     
@@ -306,15 +306,46 @@ async def get_records(username:str, db: Session = Depends(get_db)):
 
 @router.get("/user/month_records/{username}/{year}/{month}")
 async def month_records(username: str, year:int, month:int, db:Session = Depends(get_db)):
-    regs = db.query(RegsInDb).all()
     
+    meses = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]
+    
+    # 1) Todos los registros del usuario
+    regs = db.query(RegsInDb).filter(RegsInDb.username == username).all()
+
+    # 2) Filtrar los registros del mes/año solicitados
     user_regs = []
     for reg in regs:
-        if reg.username == username:
-            if reg.date.year == year: 
-                if reg.date.month == month: 
-                    user_regs.append(reg)         
-    return  user_regs
+        if reg.date.year == year and reg.date.month == month:
+            user_regs.append(reg)
+
+    # 3) Inicializar el historial de gastos de los últimos 12 meses
+    resultado = []
+    current_month = month
+    current_year = year
+
+    for _ in range(12):
+        etiqueta = f"{meses[current_month - 1]}'{str(current_year)[-2:]}"
+        # Insertamos al principio para que al final queden en orden ascendente
+        resultado.insert(0, [etiqueta, 0.0])
+
+        # Retroceder un mes
+        current_month -= 1
+        if current_month == 0:
+            current_month = 12
+            current_year -= 1
+
+    # 4) Sumar los gastos (type == "expenses") en cada mes
+    for reg in regs:
+        if reg.type == "expenses":
+            etiqueta_reg = f"{meses[reg.date.month - 1]}'{str(reg.date.year)[-2:]}"
+            # Buscar en resultado la etiqueta correspondiente
+            for item in resultado:
+                if item[0] == etiqueta_reg:
+                    item[1] += float(reg.value)
+                    break
+
+    # 5) Devolver ambos resultados sin cambiar el frontend
+    return user_regs, resultado
 
 @router.get("/user/month_regs/{username}/{year}/{month}")
 async def rec_date(username: str, year: int, month: int, db: Session = Depends(get_db)):
