@@ -307,7 +307,7 @@ async def get_records(username:str, db: Session = Depends(get_db)):
 @router.get("/user/month_records/{username}/{year}/{month}")
 async def month_records(username: str, year:int, month:int, db:Session = Depends(get_db)):
     
-    meses = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]
+    meses = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
     
     # 1) Todos los registros del usuario
     regs = db.query(RegsInDb).filter(RegsInDb.username == username).all()
