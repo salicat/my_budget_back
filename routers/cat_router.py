@@ -82,10 +82,10 @@ async def get_cats(username : str, db: Session = Depends(get_db)):
 
 @router.get("/user/cats/{username}/{year}/{month}")
 async def expire_cats(username: str, year: int, month: int, db:Session = Depends(get_db)):
-    regs = db.query(RegsInDb).all()    
+    regs = db.query(RegsInDb)  .all()    
     user_cats = []
-    cats = db.query(CatsInDb).all()    
-            
+    cats = db.query(CatsInDb).filter(CatsInDb.username == username).all()
+    
     for cat in cats:
         if username == cat.username:                        
             if cat.type == "expenses":
@@ -127,15 +127,22 @@ async def modify_cat(cat_update: CatUpDate, db: Session = Depends(get_db)):
 
 @router.delete("/user/delete/category/")
 async def delete_cat(cat_del: CatDel, db : Session = Depends(get_db)):
-    all_cats = db.query(CatsInDb).all() 
-    user_cats = []
-
-    for cat in all_cats:
-        if cat_del.username == cat.username:
-            user_cats.append(cat)
+    # 1. Consulta con print mejorado (usa logging o escribe en stderr)
+    categories_to_delete = db.query(CatsInDb).filter(
+        CatsInDb.username == cat_del.username,
+        CatsInDb.category == cat_del.category
+    ).all()
     
-    for reg in user_cats:
-        if cat_del.category == reg.category:
-            db.delete(reg)
-            db.commit()
-            db.flush(reg)
+    if not categories_to_delete:        
+        raise HTTPException(
+            status_code=404,
+            detail=f"No existe la categoría '{cat_del.category}' para el usuario {cat_del.username}"
+        )
+
+    for cat in categories_to_delete:
+        db.delete(cat)
+    
+    db.commit()
+
+    return {"message": f"Categoría '{cat_del.category}' eliminada correctamente"}
+

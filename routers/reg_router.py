@@ -139,7 +139,7 @@ def parse_products(lines: List[str]) -> List[Dict[str, Any]]:
                 products.append(current_product)
                 current_product = {}
             continue
-
+ 
         # Caso 2: Línea con un posible precio (buscamos el último número con separador)
         price_candidates = re.findall(r'(\d+(?:[.,]\d+)+)', line_clean)
         if price_candidates:
@@ -402,8 +402,7 @@ async def del_record(reg_del:RegDel, db: Session = Depends(get_db)):
 @router.get("/user/track/{username}/{year}/{month}/{category}")
 async def track_months(username: str, year: int, month: int, category: str, db: Session = Depends(get_db)):
     # Nombres de los meses con abreviaturas
-    meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 
-             'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
+    meses = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
 
     # Inicializar la lista de meses en orden ascendente, terminando en el mes solicitado
     resultado = []
